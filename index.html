@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pharma & Business Suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><path d='M35 50h30M50 35v30' stroke='%230d9488' stroke-width='10' stroke-linecap='round'/></svg>">
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top App Header -->
+  <header class="app-header no-print">
+    <div class="brand">
+      <div class="brand-icon">+</div>
+      <div>
+        <div class="brand-name">PharmaSuite <span class="brand-badge">Punjab / IN</span></div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-pharma">💊 Pharmacy Assist</button>
+      <button class="tab-btn" data-tab="tab-gst">🧾 GST Billing</button>
+      <button class="tab-btn" data-tab="tab-shopify">🛍️ Shopify Helper</button>
+      <button class="tab-btn" data-tab="tab-settings">⚙️ Settings</button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Light/Dark Theme">
+        <span id="themeIcon">☀️</span> <span id="themeText">Light</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== TAB 1: PHARMACY ASSIST ==================== -->
+  <main id="tab-pharma" class="tab-content active no-print">
+    <div class="grid-2">
+      <!-- Card: Drug Search & Spellcheck -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🔍 Indian Medicine Search & Spellchecker</h2>
+            <div class="card-subtitle">Fuzzy search 500+ Indian generic salts, brand names & dosage forms</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="text" id="drugSearchInput" class="form-control" placeholder="Type drug or salt (e.g., Amox, Pantocid, Ceftriaxone, Telmi)..." autocomplete="off">
+        </div>
+        <div id="drugSearchResults" class="search-results-list" style="display: none;"></div>
+        <div id="selectedDrugDetails" style="margin-top: 14px; display: none;">
+          <div style="background-color: var(--bg-input); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+              <strong id="detDrugName" style="font-size: 15px;"></strong>
+              <span id="detDrugSchedule" class="badge"></span>
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;"><strong>Salt / Composition:</strong> <span id="detDrugSalt"></span></div>
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;"><strong>Category:</strong> <span id="detDrugCategory"></span></div>
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;"><strong>Common Strengths:</strong> <span id="detDrugStrengths"></span></div>
+            <button id="btnAddToScratchpad" class="btn btn-primary btn-sm">+ Add to Scratchpad</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Medical Abbreviation / Sig Decoder -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📖 Prescription "Sig" Code Decoder</h2>
+            <div class="card-subtitle">Instant translation of doctor dosage shorthand</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Test Abbreviation (e.g. BD PC, TID, SOS, HS):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="sigInput" class="form-control" placeholder="e.g. BD PC, QID, STAT" autocomplete="off">
+            <button id="btnDecodeSig" class="btn btn-secondary">Decode</button>
+          </div>
+        </div>
+        <div id="sigDecodedResult" style="padding: 10px; background-color: var(--bg-input); border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 13px; margin-bottom: 12px;">
+          Type shorthand above to see full patient instructions.
+        </div>
+        <div class="table-responsive" style="max-height: 180px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr><th>Code</th><th>Meaning / Instruction</th></tr>
+            </thead>
+            <tbody id="sigTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Prescription Entry Scratchpad -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">📝 Prescription Entry Scratchpad</h2>
+          <div class="card-subtitle">Draft & review prescription data before entering into official pharmacy systems</div>
+        </div>
+        <div class="btn-group">
+          <button id="btnCopyScratchpad" class="btn btn-secondary btn-sm">📋 Copy Clean Text</button>
+          <button id="btnWhatsAppScratchpad" class="btn btn-primary btn-sm">📱 Share on WhatsApp</button>
+          <button id="btnClearScratchpad" class="btn btn-danger btn-sm">🗑️ Clear</button>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Patient Reference ID / Initials (No Full PII):</label>
+          <input type="text" id="rxPatientRef" class="form-control" placeholder="e.g. REF-1042 or P-AK">
+        </div>
+        <div class="form-group">
+          <label>Doctor Name / Clinic:</label>
+          <input type="text" id="rxDoctorName" class="form-control" placeholder="e.g. Dr. R. Sharma (Civil Hospital)">
+        </div>
+        <div class="form-group">
+          <label>Doctor Reg. No. / Date:</label>
+          <input type="text" id="rxDoctorReg" class="form-control" placeholder="e.g. PMC-48291">
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table" id="rxItemsTable">
+          <thead>
+            <tr>
+              <th style="width: 5%;">#</th>
+              <th style="width: 35%;">Medicine & Strength</th>
+              <th style="width: 15%;">Dosage Form</th>
+              <th style="width: 25%;">Directions / Frequency</th>
+              <th style="width: 12%;">Duration</th>
+              <th style="width: 8%;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="rxTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 10px;">
+        <button id="btnAddRxRow" class="btn btn-secondary btn-sm">+ Add Medicine Row</button>
+      </div>
+
+      <div class="form-group" style="margin-top: 14px;">
+        <label>Pharmacist Notes / Precautionary Advice:</label>
+        <input type="text" id="rxNotes" class="form-control" placeholder="e.g. Drink plenty of water; Take with food.">
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== TAB 2: GST INVOICING & BILLING ==================== -->
+  <main id="tab-gst" class="tab-content no-print">
+    <div id="gst-editor-area">
+      <!-- Invoice Setup Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🧾 GST Tax Invoice & Chemist Billing</h2>
+            <div class="card-subtitle">Fast, compliant retail & wholesale billing with automated CGST/SGST/IGST</div>
+          </div>
+          <div class="btn-group">
+            <button id="btnPrintInvoice" class="btn btn-primary">🖨️ Print / Save A4 PDF</button>
+            <button id="btnWhatsAppInvoice" class="btn btn-secondary">📱 Send to WhatsApp</button>
+            <button id="btnSaveInvoice" class="btn btn-secondary">💾 Save Bill</button>
+            <button id="btnNewInvoice" class="btn btn-danger btn-sm">Reset</button>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="form-group">
+            <label>Invoice Number:</label>
+            <input type="text" id="invNumber" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Invoice Date:</label>
+            <input type="date" id="invDate" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Place of Supply (State):</label>
+            <select id="invState" class="form-control">
+              <option value="03" selected>03 - Punjab (Intra-State CGST+SGST)</option>
+              <option value="06">06 - Haryana (Inter-State IGST)</option>
+              <option value="07">07 - Delhi (Inter-State IGST)</option>
+              <option value="02">02 - Himachal Pradesh (Inter-State IGST)</option>
+              <option value="04">04 - Chandigarh (Inter-State IGST)</option>
+              <option value="08">08 - Rajasthan (Inter-State IGST)</option>
+              <option value="09">09 - Uttar Pradesh (Inter-State IGST)</option>
+              <option value="99">Other State (IGST)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Payment Mode:</label>
+            <select id="invPaymentMode" class="form-control">
+              <option value="Cash">Cash</option>
+              <option value="UPI / PhonePe / GPay" selected>UPI / Online</option>
+              <option value="Credit / Card">Card</option>
+              <option value="Credit / Due">Credit (Udhar)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Customer / Patient Name:</label>
+            <input type="text" id="invCustomerName" class="form-control" placeholder="Customer Name or Walk-in">
+          </div>
+          <div class="form-group">
+            <label>Customer Mobile No. (for WhatsApp):</label>
+            <input type="text" id="invCustomerPhone" class="form-control" placeholder="e.g. 9876543210">
+          </div>
+          <div class="form-group">
+            <label>Doctor Name (Optional):</label>
+            <input type="text" id="invDoctorRef" class="form-control" placeholder="e.g. Dr. S. Verma">
+          </div>
+        </div>
+      </div>
+
+      <!-- Itemized Products Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📦 Bill Items</h3>
+          <button id="btnAddInvRow" class="btn btn-primary btn-sm">+ Add Item Row</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="invItemsTable">
+            <thead>
+              <tr>
+                <th style="width: 4%;">#</th>
+                <th style="width: 24%;">Item Description / Drug</th>
+                <th style="width: 10%;">HSN</th>
+                <th style="width: 11%;">Batch No.</th>
+                <th style="width: 9%;">Exp Date</th>
+                <th style="width: 8%;">Qty</th>
+                <th style="width: 10%;">Rate (₹)</th>
+                <th style="width: 7%;">Disc %</th>
+                <th style="width: 9%;">GST %</th>
+                <th style="width: 11%;">Total (₹)</th>
+                <th style="width: 5%;"></th>
+              </tr>
+            </thead>
+            <tbody id="invTableBody">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Summary Calculation Area -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+          <div style="width: 320px; background-color: var(--bg-input); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: var(--text-muted);">Taxable Amount:</span>
+              <strong id="lblTaxable">₹0.00</strong>
+            </div>
+            <div id="cgstRow" style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: var(--text-muted);">CGST:</span>
+              <span id="lblCGST">₹0.00</span>
+            </div>
+            <div id="sgstRow" style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: var(--text-muted);">SGST:</span>
+              <span id="lblSGST">₹0.00</span>
+            </div>
+            <div id="igstRow" style="display: none; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: var(--text-muted);">IGST:</span>
+              <span id="lblIGST">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="color: var(--text-muted);">Round Off:</span>
+              <span id="lblRoundOff">₹0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border-color); font-size: 16px; color: var(--primary);">
+              <strong>Grand Total:</strong>
+              <strong id="lblGrandTotal">₹0.00</strong>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: right;" id="lblAmountInWords">
+              Zero Rupees Only
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Invoices History Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🗄️ Saved Invoices History (Local Storage)</h3>
+          <div class="form-group" style="margin-bottom: 0;">
+            <input type="text" id="searchHistoryInput" class="form-control" placeholder="Search by Invoice # or Name..." style="width: 220px;">
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Total (₹)</th>
+                <th>Payment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- History rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== GST A4 PRINT TEMPLATE (VISIBLE ONLY DURING PRINT) ==================== -->
+  <div id="gst-print-area" style="display: none;">
+    <div style="border: 2px solid #000; padding: 15px; font-family: 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #000; background: #fff;">
+      <!-- Invoice Header -->
+      <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 10px;">
+        <div>
+          <h1 id="pStoreName" style="font-size: 20px; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">CHEMIST & DRUGGIST</h1>
+          <div id="pStoreAddress" style="font-size: 11px;">Main Market, Amritsar, Punjab - 143001</div>
+          <div style="font-size: 11px;"><strong>Phone:</strong> <span id="pStorePhone">+91-9876543210</span> | <strong>Email:</strong> <span id="pStoreEmail">store@example.com</span></div>
+          <div style="font-size: 11px;"><strong>GSTIN:</strong> <span id="pStoreGSTIN">03AAAAA0000A1Z5</span> | <strong>D.L. No.:</strong> <span id="pStoreDL">20B/21B-PB-12345</span></div>
+        </div>
+        <div style="text-align: right;">
+          <div style="background: #000; color: #fff; padding: 4px 8px; font-weight: bold; font-size: 13px; display: inline-block;">TAX INVOICE</div>
+          <div style="font-size: 12px; margin-top: 6px;"><strong>Invoice No:</strong> <span id="pInvNumber"></span></div>
+          <div style="font-size: 12px;"><strong>Date:</strong> <span id="pInvDate"></span></div>
+          <div style="font-size: 12px;"><strong>Place of Supply:</strong> <span id="pInvState"></span></div>
+        </div>
+      </div>
+
+      <!-- Bill To & Doctor -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 10px; font-size: 11px;">
+        <div>
+          <strong>Billed To:</strong><br>
+          <span id="pCustomerName" style="font-size: 13px; font-weight: bold;"></span><br>
+          Phone: <span id="pCustomerPhone"></span>
+        </div>
+        <div style="text-align: right;">
+          <strong>Prescribed By:</strong><br>
+          <span id="pDoctorRef" style="font-size: 12px;"></span><br>
+          Payment Mode: <strong id="pPaymentMode"></strong>
+        </div>
+      </div>
+
+      <!-- Itemized Table -->
+      <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 12px;">
+        <thead>
+          <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000; background-color: #f3f3f3;">
+            <th style="padding: 5px; border: 1px solid #000; width: 5%;">S.N.</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 35%; text-align: left;">Item Description / Salt</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 10%;">HSN</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 12%;">Batch</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 8%;">Exp</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 6%;">Qty</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 8%;">Rate</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 6%;">GST%</th>
+            <th style="padding: 5px; border: 1px solid #000; width: 10%; text-align: right;">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="pTableBody">
+          <!-- Print rows -->
+        </tbody>
+      </table>
+
+      <!-- Totals & Signatory -->
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; border-top: 1px solid #000; padding-top: 8px; font-size: 11px;">
+        <div>
+          <div><strong>Amount in Words:</strong></div>
+          <div id="pAmountInWords" style="font-style: italic; font-weight: bold; margin-bottom: 10px;"></div>
+          <div style="font-size: 10px; color: #444;">
+            <strong>Terms & Conditions:</strong><br>
+            1. Goods once sold will not be taken back without original bill.<br>
+            2. Medicines must be stored under recommended conditions.<br>
+            3. Subject to local jurisdiction only.
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+            <span>Taxable Amount:</span> <strong id="pTaxable">₹0.00</strong>
+          </div>
+          <div id="pCgstRow" style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+            <span>CGST:</span> <span id="pCGST">₹0.00</span>
+          </div>
+          <div id="pSgstRow" style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+            <span>SGST:</span> <span id="pSGST">₹0.00</span>
+          </div>
+          <div id="pIgstRow" style="display: none; justify-content: space-between; margin-bottom: 3px;">
+            <span>IGST:</span> <span id="pIGST">₹0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+            <span>Round Off:</span> <span id="pRoundOff">₹0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 1px solid #000; padding-top: 4px; font-size: 14px; font-weight: bold;">
+            <span>Grand Total:</span> <span id="pGrandTotal">₹0.00</span>
+          </div>
+          <div style="margin-top: 30px; border-top: 1px dashed #000; padding-top: 4px;">
+            Authorized Signatory
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: SHOPIFY E-COMMERCE HELPER ==================== -->
+  <main id="tab-shopify" class="tab-content no-print">
+    <div class="grid-2">
+      <!-- Card: Product Description HTML Formatter -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📝 Product Description HTML Formatter</h2>
+            <div class="card-subtitle">Format clean, high-converting product pages ready for Shopify</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Product Title:</label>
+          <input type="text" id="shTitle" class="form-control" placeholder="e.g. Herbal Vitamin C Immunity Booster (60 Capsules)">
+        </div>
+        <div class="form-group">
+          <label>Key Highlights / Bullet Points (One per line):</label>
+          <textarea id="shHighlights" class="form-control" placeholder="100% Pure Natural Plant Extracts&#10;Supports Daily Immunity & Vitality&#10;Zero Preservatives or Added Sugars&#10;Manufactured in WHO-GMP Certified Facility"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Full Product Description & Usage Instructions:</label>
+          <textarea id="shDescription" class="form-control" placeholder="Take 1 capsule twice daily after meals or as directed by a healthcare professional."></textarea>
+        </div>
+        <div class="btn-group">
+          <button id="btnGenerateShopifyHTML" class="btn btn-primary btn-sm">⚡ Generate Shopify HTML</button>
+          <button id="btnCopyShopifyHTML" class="btn btn-secondary btn-sm">📋 Copy HTML</button>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label>Generated HTML Output:</label>
+          <textarea id="shHtmlOutput" class="form-control" readonly style="font-family: monospace; font-size: 12px; height: 120px;"></textarea>
+        </div>
+      </div>
+
+      <!-- Card: SKU & Barcode Generator -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🏷️ SKU & EAN Barcode Generator</h2>
+            <div class="card-subtitle">Standardize inventory SKU codes & valid checksum barcodes</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Brand / Category Prefix:</label>
+          <input type="text" id="skuPrefix" class="form-control" placeholder="e.g. HERB or KWL">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Product Short Name:</label>
+            <input type="text" id="skuProduct" class="form-control" placeholder="e.g. VIT-C">
+          </div>
+          <div class="form-group">
+            <label>Variant / Pack Size:</label>
+            <input type="text" id="skuVariant" class="form-control" placeholder="e.g. 60CAP or 100ML">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button id="btnGenerateSKU" class="btn btn-primary btn-sm">Generate SKU & Barcode</button>
+        </div>
+
+        <div style="margin-top: 18px; padding: 14px; background-color: var(--bg-input); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <div style="font-size: 13px; color: var(--text-muted);">Standardized SKU:</div>
+          <div id="lblGeneratedSKU" style="font-size: 18px; font-weight: bold; color: var(--primary); letter-spacing: 1px; margin-bottom: 8px;">---</div>
+          <div style="font-size: 13px; color: var(--text-muted);">13-Digit EAN Barcode:</div>
+          <div id="lblGeneratedBarcode" style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">---</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Shopify CSV Bulk Exporter -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">📤 Shopify Bulk Import CSV Exporter</h2>
+          <div class="card-subtitle">Create structured catalog data for 1-click bulk import into Shopify Admin</div>
+        </div>
+        <button id="btnExportShopifyCSV" class="btn btn-primary btn-sm">💾 Download Shopify CSV</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table" id="shopifyCsvTable">
+          <thead>
+            <tr>
+              <th style="width: 25%;">Title</th>
+              <th style="width: 15%;">SKU</th>
+              <th style="width: 15%;">Price (₹)</th>
+              <th style="width: 15%;">Compare Price (MRP)</th>
+              <th style="width: 12%;">Inventory Qty</th>
+              <th style="width: 10%;">Vendor</th>
+              <th style="width: 8%;"></th>
+            </tr>
+          </thead>
+          <tbody id="shopifyCsvTableBody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 10px;">
+        <button id="btnAddShopifyRow" class="btn btn-secondary btn-sm">+ Add Product Row</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== TAB 4: SETTINGS & BACKUP ==================== -->
+  <main id="tab-settings" class="tab-content no-print">
+    <div class="grid-2">
+      <!-- Card: Store & Business Profile -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🏪 Store & Invoice Defaults</h2>
+          <button id="btnSaveStoreProfile" class="btn btn-primary btn-sm">Save Profile</button>
+        </div>
+        <div class="form-group">
+          <label>Store / Pharmacy Business Name:</label>
+          <input type="text" id="setStoreName" class="form-control" value="Kwality Pharma & Chemists">
+        </div>
+        <div class="form-group">
+          <label>Address Line & City:</label>
+          <input type="text" id="setStoreAddress" class="form-control" value="Majitha Road, Amritsar, Punjab - 143001">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Phone / WhatsApp Number:</label>
+            <input type="text" id="setStorePhone" class="form-control" value="9876543210">
+          </div>
+          <div class="form-group">
+            <label>Email Address:</label>
+            <input type="email" id="setStoreEmail" class="form-control" value="support@kwalitypharma.com">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>GSTIN:</label>
+            <input type="text" id="setStoreGSTIN" class="form-control" value="03AAACK6458M1ZB">
+          </div>
+          <div class="form-group">
+            <label>Drug License No. (20B / 21B):</label>
+            <input type="text" id="setStoreDL" class="form-control" value="PB-ASR-20B-10492 / 21B-10493">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Data Backup & Management -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">💾 Backup & Local Data Control</h2>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          All your invoices, drafts, and preferences are stored 100% locally on this device. You can download a backup JSON file anytime or transfer it to another computer or phone.
+        </p>
+        <div class="btn-group" style="margin-bottom: 20px;">
+          <button id="btnExportBackup" class="btn btn-primary">📥 Download Full Backup (JSON)</button>
+          <label class="btn btn-secondary" style="cursor: pointer;">
+            📤 Restore Backup (JSON)
+            <input type="file" id="importBackupFile" accept=".json" style="display: none;">
+          </label>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 14px;">
+        <div>
+          <button id="btnClearAllData" class="btn btn-danger btn-sm">⚠️ Clear All Local Invoices & Data</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast Message Element -->
+<div id="toast">Action completed!</div>
+
+<script src="app.js"></script>
+</body>
+</html>
